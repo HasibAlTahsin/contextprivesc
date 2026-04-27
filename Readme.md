@@ -262,7 +262,7 @@ python3 -c "import gtfobins_db; print('✓ GTFOBins OK')"
 
 ---
 
-## 🎮 Usage
+##  Usage
 
 ### CLI Mode (Terminal)
 
@@ -296,10 +296,10 @@ sudo python3 web_server.py --api-key sk-ant-YOURKEY
 ### Dashboard Workflow
 
 1. **Open Browser:** Navigate to `http://localhost:5000`
-2. **Start Scan:** Click the green **▶ Start Scan** button
+2. **Start Scan:** Click the green ** Start Scan** button
 3. **Monitor Output:** Watch real-time findings in the terminal panel
 4. **Review Findings:** Click cards to expand details and exploit commands
-5. **AI Analysis:** Click **🤖 START AI** after scan completion for attack chain recommendations
+5. **AI Analysis:** Click ** START AI** after scan completion for attack chain recommendations
 6. **Export Results:** Findings auto-save to `/tmp/contextprivesc_YYYYMMDD_HHMMSS/`
 
 ### Understanding Severity Levels
