@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContextPrivesc - Security Dashboard</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0e27;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #111827;
+            padding: 15px 20px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { font-size: 20px; font-weight: bold; color: #10b981; }
+        .stats { display: flex; gap: 20px; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; }
+        .stat-critical .stat-value { color: #ef4444; }
+        .stat-warning .stat-value { color: #f59e0b; }
+        .stat-info .stat-value { color: #3b82f6; }
+        .stat-label { font-size: 9px; color: #94a3b8; }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #1e293b;
+            color: white;
+            border: 1px solid #334155;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-family: monospace;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .btn-scan { background: #10b981; color: #000; border: none; }
+        .btn-stop { background: #ef4444; color: #fff; border: none; display: none; }
+        .btn-ai {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            border: none;
+        }
+        .btn-ai:hover { transform: scale(1.02); }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .progress-bar { height: 2px; background: #1e293b; }
+        .progress-fill.active {
+            background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+            width: 100%;
+            height: 100%;
+            animation: pulse 0.5s infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+        .main { display: flex; flex: 1; overflow: hidden; gap: 1px; background: #1e293b; }
+        .terminal-panel, .findings-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0f172a;
+            overflow: hidden;
+        }
+        .panel-header {
+            background: #1e293b;
+            padding: 8px 12px;
+            border-bottom: 1px solid #334155;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        #terminal {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            background: #050814;
+            white-space: pre-wrap;
+        }
+        .term-critical { color: #ff6b6b; font-weight: bold; }
+        .term-warning { color: #ffd93d; }
+        .term-info { color: #6bc5ff; }
+        .term-default { color: #a0aec0; }
+        #findings-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .finding {
+            background: #1e293b;
+            border-left: 3px solid;
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+        }
+        .finding.critical { border-color: #ef4444; }
+        .finding.warning { border-color: #f59e0b; }
+        .finding.info { border-color: #3b82f6; }
+        .finding-title { font-weight: bold; font-size: 11px; }
+        .finding-detail { font-size: 9px; color: #94a3b8; margin-top: 3px; }
+        .details-btn { background: #0ea5e9; border: none; padding: 2px 8px; cursor: pointer; font-size: 8px; border-radius: 3px; margin-top: 5px; color: white; }
+        .ai-panel {
+            background: #0f172a;
+            border-top: 1px solid #1e293b;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+        }
+        .ai-header {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 8px 16px;
+        }
+        .ai-title { font-size: 12px; font-weight: bold; color: #8b5cf6; }
+        .ai-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            font-size: 11px;
+            line-height: 1.5;
+            background: #090c1c;
+            color: #a0aec0;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            width: 85%;
+            max-width: 700px;
+            max-height: 85%;
+            overflow: hidden;
+        }
+        .modal-header {
+            padding: 12px;
+            background: #334155;
+            display: flex;
+            justify-content: space-between;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 22px;
+            cursor: pointer;
+        }
+        .modal-body { padding: 12px; overflow-y: auto; max-height: 70vh; }
+        pre { background: #0f172a; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 9px; color: #10b981; }
+        .copy-btn { background: #0ea5e9; color: white; border: none; padding: 2px 8px; cursor: pointer; font-size: 9px; border-radius: 3px; margin-top: 5px; }
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #64748b; margin-right: 5px; }
+        .status-dot.scanning { background: #10b981; animation: blink 1s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .empty-state { text-align: center; color: #64748b; padding: 30px; }
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #8b5cf6;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">🔐 ContextPrivesc v1.0</div>
+    <div class="stats">
+        <div class="stat stat-critical"><div class="stat-value" id="critical-count">0</div><div class="stat-label">CRITICAL</div></div>
+        <div class="stat stat-warning"><div class="stat-value" id="warning-count">0</div><div class="stat-label">WARNING</div></div>
+        <div class="stat stat-info"><div class="stat-value" id="info-count">0</div><div class="stat-label">INFO</div></div>
+    </div>
+    <div class="button-container">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text" style="font-size:10px;">READY</span>
+        <button id="scanBtn" class="btn-scan">▶ START SCAN</button>
+        <button id="stopBtn" class="btn-stop">⏹ STOP</button>
+        <button id="aiStartBtn" class="btn-ai">🤖 START AI</button>
+    </div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="main">
+    <div class="terminal-panel">
+        <div class="panel-header">📟 TERMINAL OUTPUT</div>
+        <div id="terminal"><div class="empty-state">⚡ Ready. Click START SCAN.</div></div>
+    </div>
+    <div class="findings-panel">
+        <div class="panel-header">🎯 FINDINGS (<span id="findings-count">0</span>)</div>
+        <div id="findings-list"><div class="empty-state">📋 No findings yet. Start a scan.</div></div>
+    </div>
+</div>
+
+<div class="ai-panel">
+    <div class="ai-header">
+        <div class="ai-title">🤖 DEEPSEEK AI SECURITY ANALYZER</div>
+    </div>
+    <div id="ai-content" class="ai-content">✨ DeepSeek AI is ready. Click "<span style="color: #8b5cf6; font-weight: bold;">START AI</span>" button after scan completes to analyze findings and get exploit recommendations.</div>
+</div>
+
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3 id="modalTitle">Finding Details</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+        <div id="modalBody" class="modal-body">Loading...</div>
+    </div>
+</div>
+
+<script>
+const socket = io();
+let findings = [];
+let critical = 0, warning = 0, info = 0;
+
+function escapeHtml(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function updateStats() {
+    document.getElementById('critical-count').textContent = critical;
+    document.getElementById('warning-count').textContent = warning;
+    document.getElementById('info-count').textContent = info;
+    document.getElementById('findings-count').textContent = findings.length;
+}
+
+function addTerminalLine(line) {
+    const term = document.getElementById('terminal');
+    if (term.innerHTML.includes('Ready')) term.innerHTML = '';
+    const div = document.createElement('div');
+    let cls = 'term-default';
+    if (line.includes('CRITICAL')) cls = 'term-critical';
+    else if (line.includes('WARNING')) cls = 'term-warning';
+    else if (line.includes('INFO')) cls = 'term-info';
+    div.className = cls;
+    div.textContent = line;
+    term.appendChild(div);
+    term.scrollTop = term.scrollHeight;
+    while (term.children.length > 500) term.removeChild(term.firstChild);
+}
+
+function addFindingCard(f) {
+    const container = document.getElementById('findings-list');
+    if (container.innerHTML.includes('No findings')) container.innerHTML = '';
+    const div = document.createElement('div');
+    const sevClass = f.severity ? f.severity.toLowerCase() : 'info';
+    div.className = `finding ${sevClass}`;
+    const idx = findings.length - 1;
+    div.innerHTML = `<div class="finding-title">[${f.severity}] ${escapeHtml(f.title)}</div>
+        <div class="finding-detail">${escapeHtml((f.detail||'').substring(0,100))}</div>
+        <button class="details-btn" onclick="showDetails(${idx})">📋 VIEW DETAILS</button>`;
+    container.appendChild(div);
+}
+
+window.showDetails = function(idx) {
+    const f = findings[idx];
+    if (!f) return;
+    document.getElementById('modalTitle').innerHTML = `${f.severity} - ${escapeHtml(f.title)}`;
+    let html = `<div style="margin-bottom:10px;"><strong>Severity:</strong> ${f.severity}</div>
+        <div style="margin-bottom:10px;"><strong>Category:</strong> ${escapeHtml(f.category||'N/A')}</div>
+        <div style="margin-bottom:10px;"><strong>Title:</strong> ${escapeHtml(f.title)}</div>
+        <div style="margin-bottom:10px;"><strong>Details:</strong> ${escapeHtml(f.detail||'No details')}</div>`;
+    if(f.mitre_id) html += `<div style="margin-bottom:10px;"><strong>MITRE:</strong> ${escapeHtml(f.mitre_id)}</div>`;
+    if(f.exploit) { html += `<div style="margin-bottom:10px;"><strong>Exploit:</strong><pre>${escapeHtml(f.exploit)}</pre><button class="copy-btn" onclick="copyExploit()">Copy</button></div>`; window.currentExploit = f.exploit; }
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('detailsModal').classList.add('active');
+};
+
+window.copyExploit = function() { if(window.currentExploit) { navigator.clipboard.writeText(window.currentExploit); alert('Copied!'); } };
+window.closeModal = function() { document.getElementById('detailsModal').classList.remove('active'); };
+
+async function runAIAnalysis() {
+    console.log("AI Analysis started");
+    if (findings.length === 0) {
+        alert('No findings to analyze. Please run a scan first.');
+        return;
+    }
+    
+    const aiBtn = document.getElementById('aiStartBtn');
+    aiBtn.disabled = true;
+    aiBtn.innerHTML = '🔄 ANALYZING...';
+    
+    const aiContent = document.getElementById('ai-content');
+    aiContent.innerHTML = '<div class="loading"></div> Analyzing findings with DeepSeek AI...';
+    
+    try {
+        const response = await fetch('/api/ai/analyze');
+        const data = await response.json();
+        console.log("AI Response:", data);
+        
+        if (data.error) {
+            aiContent.innerHTML = `❌ Error: ${data.error}`;
+        } else if (data.analysis) {
+            let formatted = data.analysis.replace(/\n/g, '<br>');
+            aiContent.innerHTML = `<div style="color:#8b5cf6; margin-bottom:12px; font-weight:bold;">🤖 DeepSeek AI Security Analysis</div><div style="line-height:1.6;">${formatted}</div>`;
+        } else {
+            aiContent.innerHTML = '⚠️ No analysis data received.';
+        }
+    } catch (error) {
+        console.error("AI Error:", error);
+        aiContent.innerHTML = `❌ Failed: ${error.message}`;
+    } finally {
+        aiBtn.disabled = false;
+        aiBtn.innerHTML = '🤖 START AI';
+    }
+}
+
+socket.on('connect', () => {
+    console.log("Socket connected");
+    document.getElementById('status-text').textContent = 'CONNECTED';
+    document.getElementById('status-dot').classList.add('scanning');
+});
+
+socket.on('scan_started', () => {
+    document.getElementById('scanBtn').style.display = 'none';
+    document.getElementById('stopBtn').style.display = 'inline-block';
+    document.getElementById('progress').classList.add('active');
+    document.getElementById('terminal').innerHTML = '';
+    document.getElementById('findings-list').innerHTML = '';
+    findings = []; critical = warning = info = 0;
+    updateStats();
+});
+
+socket.on('scan_complete', (data) => {
+    document.getElementById('scanBtn').style.display = 'inline-block';
+    document.getElementById('stopBtn').style.display = 'none';
+    document.getElementById('progress').classList.remove('active');
+    if(findings.length === 0) {
+        document.getElementById('findings-list').innerHTML = '<div class="empty-state">✅ No vulnerabilities found.</div>';
+    }
+});
+
+socket.on('terminal_line', (data) => {
+    const line = data.line;
+    if (line.includes('Scanning')) return;
+    addTerminalLine(line);
+});
+socket.on('new_finding', (f) => {
+    findings.push(f);
+    if(f.severity === 'CRITICAL') critical++;
+    else if(f.severity === 'WARNING') warning++;
+    else info++;
+    updateStats();
+    addFindingCard(f);
+});
+socket.on('error', (data) => console.error("Socket error:", data));
+
+document.getElementById('scanBtn').onclick = () => {
+    socket.emit('set_mode', {mode: 'normal'});
+    setTimeout(() => socket.emit('start_scan'), 100);
+};
+document.getElementById('stopBtn').onclick = () => socket.emit('stop_scan');
+document.getElementById('aiStartBtn').onclick = () => runAIAnalysis();
+
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+document.getElementById('detailsModal').onclick = (e) => { if(e.target === document.getElementById('detailsModal')) closeModal(); };
+
+console.log("Dashboard ready - DeepSeek AI is enabled");
+</script>
+</body>
+</html>

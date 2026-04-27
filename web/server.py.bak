@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+import os
+import sys
+import json
+import argparse
+import subprocess
+import threading
+from pathlib import Path
+from datetime import datetime
+from flask import Flask, render_template, jsonify
+from flask_socketio import SocketIO, emit
+from flask_cors import CORS
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.urandom(24).hex()
+CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+
+scan_state = {
+    "scanning": False,
+    "findings": [],
+    "logs": [],
+    "mode": "normal"
+}
+scan_process = None
+ai_client = None
+
+# DeepSeek AI Client
+class DeepSeekClient:
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.base_url = "https://api.deepseek.com/v1"
+    
+    def chat(self, messages, max_tokens=1000):
+        import requests
+        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        payload = {"model": "deepseek-chat", "messages": messages, "max_tokens": max_tokens, "temperature": 0.3}
+        try:
+            resp = requests.post(f"{self.base_url}/chat/completions", headers=headers, json=payload, timeout=30)
+            return resp.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+        except Exception as e:
+            return f"AI Error: {str(e)}"
+
+@app.route('/')
+def index():
+    return render_template('dashboard.html')
+
+@app.route('/api/status')
+def status():
+    return jsonify({
+        "scanning": scan_state["scanning"],
+        "findings_count": len(scan_state["findings"]),
+        "critical": len([f for f in scan_state["findings"] if f.get("severity") == "CRITICAL"]),
+        "warning": len([f for f in scan_state["findings"] if f.get("severity") == "WARNING"]),
+        "info": len([f for f in scan_state["findings"] if f.get("severity") == "INFO"]),
+        "ai_available": ai_client is not None
+    })
+
+@app.route('/api/findings')
+def get_findings():
+    return jsonify(scan_state["findings"])
+
+@app.route('/api/ai/analyze')
+def ai_analyze():
+    if not ai_client:
+        return jsonify({"error": "AI not configured. Please provide --ai-key"}), 400
+    if not scan_state["findings"]:
+        return jsonify({"error": "No findings to analyze. Please run a scan first."}), 400
+    
+    critical_findings = [f for f in scan_state["findings"] if f.get("severity") == "CRITICAL"]
+    
+    prompt = f"""You are a Linux security expert. Analyze these findings and provide:
+
+SYSTEM: {os.uname().nodename}
+KERNEL: {os.uname().release}
+CRITICAL FINDINGS: {len(critical_findings)}
+TOTAL FINDINGS: {len(scan_state["findings"])}
+
+TOP FINDINGS:
+{json.dumps(critical_findings[:10], indent=2)}
+
+Please provide:
+1. The MOST CRITICAL vulnerability to exploit first
+2. EXACT exploit command for the top vulnerability
+3. Step-by-step exploitation process
+4. How to achieve root access
+5. Remediation commands to fix these issues
+
+Be technical and provide actual commands."""
+    
+    response = ai_client.chat([{"role": "user", "content": prompt}])
+    return jsonify({"analysis": response, "findings_analyzed": len(scan_state["findings"])})
+
+@socketio.on('connect')
+def handle_connect():
+    print("Client connected")
+    emit('status', {"scanning": scan_state["scanning"], "findings_count": len(scan_state["findings"])})
+
+@socketio.on('start_scan')
+def start_scan():
+    global scan_process, scan_state
+    if scan_state["scanning"]:
+        emit('error', {'message': 'Scan already running'})
+        return
+    
+    scan_state["scanning"] = True
+    scan_state["findings"] = []
+    scan_state["logs"] = []
+    
+    thread = threading.Thread(target=run_scanner, args=(socketio,))
+    thread.daemon = True
+    thread.start()
+    
+    emit('scan_started', {'timestamp': datetime.now().isoformat()})
+
+@socketio.on('stop_scan')
+def stop_scan():
+    global scan_process, scan_state
+    scan_state["scanning"] = False
+    if scan_process:
+        scan_process.terminate()
+    emit('scan_stopped', {'message': 'Scan stopped by user'})
+
+@socketio.on('set_mode')
+def set_mode(data):
+    scan_state["mode"] = data.get("mode", "normal")
+    print(f"Mode set to: {scan_state['mode']}")
+
+def run_scanner(sio):
+    global scan_process, scan_state
+    
+    scanner_path = Path(__file__).parent.parent / "core" / "scanner.py"
+    cmd = [sys.executable, str(scanner_path), "--mode", scan_state["mode"]]
+    
+    print(f"Starting: {' '.join(cmd)}")
+    sio.emit('terminal_line', {'line': f"[INFO] Starting {scan_state['mode'].upper()} scan..."})
+    
+    try:
+        scan_process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
+        
+        for line in iter(scan_process.stdout.readline, ''):
+            if not scan_state["scanning"]:
+                break
+            
+            line = line.rstrip()
+            if line:
+                scan_state["logs"].append(line)
+                sio.emit('terminal_line', {'line': line})
+                
+                if line.startswith('{') and '"severity"' in line:
+                    try:
+                        finding = json.loads(line)
+                        scan_state["findings"].append(finding)
+                        sio.emit('new_finding', finding)
+                    except:
+                        pass
+        
+        scan_process.wait()
+    except Exception as e:
+        sio.emit('error', {'message': str(e)})
+    finally:
+        scan_state["scanning"] = False
+        sio.emit('scan_complete', {
+            'total': len(scan_state["findings"]),
+            'critical': len([f for f in scan_state["findings"] if f.get("severity") == "CRITICAL"])
+        })
+        print(f"Scan complete. Found {len(scan_state['findings'])} findings")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int, default=5000)
+    parser.add_argument("--host", default="0.0.0.0")
+    parser.add_argument("--ai-key", help="DeepSeek API key")
+    parser.add_argument("--debug", action="store_true")
+    args = parser.parse_args()
+    
+    if args.ai_key:
+        ai_client = DeepSeekClient(args.ai_key)
+        print("AI Enabled with DeepSeek")
+    
+    print("\n" + "="*60)
+    print("ContextPrivesc v1.0 - Web Dashboard")
+    print(f"URL: http://{args.host}:{args.port}")
+    print(f"AI: {'Enabled' if ai_client else 'Disabled'}")
+    print("="*60 + "\n")
+    
+    socketio.run(app, host=args.host, port=args.port, debug=args.debug)
