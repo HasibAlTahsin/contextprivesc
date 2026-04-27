@@ -228,7 +228,7 @@
     <div class="ai-header">
         <div class="ai-title">🤖 AI SECURITY ANALYZER</div>
     </div>
-    <div id="ai-content" class="ai-content">✨ DeepSeek AI is ready. Click "<span style="color: #8b5cf6; font-weight: bold;">START AI</span>" button after scan completes to analyze findings and get exploit recommendations.</div>
+    <div id="ai-content" class="ai-content">✨ AI is ready. Click "<span style="color: #8b5cf6; font-weight: bold;">START AI</span>" button after scan completes to analyze findings and get exploit recommendations.</div>
 </div>
 
 <div id="detailsModal" class="modal">
@@ -309,7 +309,7 @@ async function runAIAnalysis() {
     aiBtn.innerHTML = '🔄 ANALYZING...';
     
     const aiContent = document.getElementById('ai-content');
-    aiContent.innerHTML = '<div class="loading"></div> Analyzing findings with DeepSeek AI...';
+    aiContent.innerHTML = '<div class="loading"></div> Analyzing findings with AI...';
     
     try {
         const response = await fetch('/api/ai/analyze');
@@ -320,7 +320,7 @@ async function runAIAnalysis() {
             aiContent.innerHTML = `❌ Error: ${data.error}`;
         } else if (data.analysis) {
             let formatted = data.analysis.replace(/\n/g, '<br>');
-            aiContent.innerHTML = `<div style="color:#8b5cf6; margin-bottom:12px; font-weight:bold;">🤖 DeepSeek AI Security Analysis</div><div style="line-height:1.6;">${formatted}</div>`;
+            aiContent.innerHTML = `<div style="color:#8b5cf6; margin-bottom:12px; font-weight:bold;">🤖 AI Security Analysis</div><div style="line-height:1.6;">${formatted}</div>`;
         } else {
             aiContent.innerHTML = '⚠️ No analysis data received.';
         }
@@ -383,7 +383,7 @@ document.getElementById('aiStartBtn').onclick = () => runAIAnalysis();
 document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
 document.getElementById('detailsModal').onclick = (e) => { if(e.target === document.getElementById('detailsModal')) closeModal(); };
 
-console.log("Dashboard ready - DeepSeek AI is enabled");
+console.log("Dashboard ready - AI is enabled");
 </script>
 </body>
 </html>
