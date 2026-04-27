@@ -13,24 +13,6 @@
 
 </div>
 
----
-
-##  Table of Contents
-
-- [Overview](#-overview)
-- [Quick Start](#-quick-start)
-- [Features](#-features)
-- [Project Structure](#-project-structure)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [AI Integration](#-ai-integration)
-- [Output Format](#-output-format)
-- [Scan Categories](#-scan-categories)
-- [Troubleshooting](#-troubleshooting)
-- [Security Considerations](#-security-considerations)
-- [License](#-license)
-
----
 
 ##  Overview
 
