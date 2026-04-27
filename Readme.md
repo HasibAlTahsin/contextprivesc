@@ -14,6 +14,8 @@
 </div>
 
 
+---
+
 ##  Overview
 
 **ContextPrivesc** is an advanced Linux privilege escalation detection tool designed for security researchers, penetration testers, and CTF enthusiasts. It combines traditional enumeration techniques with intelligent analysis to deliver actionable security intelligence through a modern web interface.
