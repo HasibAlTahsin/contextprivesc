@@ -310,15 +310,6 @@ ContextPrivesc integrates with **DeepSeek AI** to provide intelligent security a
 |  Metasploit Module Recommendations | Suggests specific Metasploit modules for exploitation |
 |  Remediation Guidance | Provides exact commands to fix discovered vulnerabilities |
 
-### API Configuration
-
-The API key is embedded in `web_server.py` for convenience:
-
-```python
-# web_server.py (lines ~20-22)
-DEEPSEEK_API_KEY = "sk-faf7fc01b0804802a1d1faa1cb36176f"
-DEEPSEEK_API_BASE = "https://api.deepseek.com/v1"
-```
 
 >  **Security Note:** For production deployments, rotate this API key and consider using environment variables.
 
