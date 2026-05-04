@@ -48,7 +48,7 @@ cd ~/contextprivesc
 sudo bash setup.sh
 
 # 4. Start web server
-sudo python3 web_server.py --port 8080
+sudo python3 web/server.py --port 8080
 
 # 5. Open browser
 firefox http://localhost:8080
