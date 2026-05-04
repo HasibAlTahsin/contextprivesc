@@ -268,13 +268,11 @@ sudo python3 core/scanner.py --json > results.json
 
 ```bash
 # Start web server (default port: 5000)
-sudo python3 web_server.py
+sudo python3 web/server.py
 
 # Custom port
-sudo python3 web_server.py --port 8080
+sudo python3 web/server.py --port 8080
 
-# With AI API key (optional)
-sudo python3 web_server.py --api-key sk-ant-YOURKEY
 ```
 
 ### Dashboard Workflow
